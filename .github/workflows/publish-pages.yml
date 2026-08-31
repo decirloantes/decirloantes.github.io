@@ -1,0 +1,61 @@
+name: Publicar Decirlo antes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - automation/content.enc
+      - scripts/**
+      - .github/workflows/publish-pages.yml
+  workflow_dispatch:
+  schedule:
+    - cron: "17 9-16 * * *"
+      timezone: Europe/Madrid
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar-entradas
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v6
+
+      - name: Descifrar las fuentes privadas
+        env:
+          CONTENT_KEY_B64: ${{ secrets.CONTENT_KEY_B64 }}
+        run: node scripts/decrypt-content.mjs
+
+      - name: Preparar los recursos visuales
+        run: |
+          mkdir -p .private-content/site/assets
+          cp assets/styles.css .private-content/site/assets/styles.css
+          cp assets/favicon.svg .private-content/site/assets/favicon.svg
+          cp .nojekyll .private-content/site/.nojekyll
+
+      - name: Construir las entradas que ya deben ser públicas
+        env:
+          BLOG_ROOT: ${{ github.workspace }}/.private-content
+        run: node scripts/build-site.mjs
+
+      - name: Sincronizar únicamente el sitio público
+        run: node scripts/sync-site.mjs
+
+      - name: Eliminar las fuentes descifradas
+        run: node scripts/cleanup-private.mjs
+
+      - name: Registrar una publicación nueva
+        shell: bash
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .nojekyll 404.html feed.xml index.html robots.txt sitemap.xml acerca-de archivo assets posts
+            git commit -m "Publicar las entradas previstas para $(date -u +%F)"
+            git push
+          fi
