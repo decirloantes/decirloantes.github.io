@@ -89,6 +89,7 @@ main { width: min(1180px, calc(100% - 3rem)); margin: auto; }
   transform: rotate(-1.5deg);
 }
 .hero-copy, .signal-card { position: relative; z-index: 1; }
+.hero-copy { min-width: 0; }
 .eyebrow, .category { margin: 0 0 1rem; color: var(--accent-dark); font-size: .74rem; font-weight: 850; letter-spacing: .15em; text-transform: uppercase; }
 .hero .eyebrow { color: #f4aaa3; }
 .hero h1 {
@@ -176,7 +177,13 @@ footer p { margin: 0; }
   main, footer { width: min(100% - 2rem, 1180px); }
   .hero { min-height: auto; margin-top: 1rem; padding: 4.2rem 1.5rem 5rem; grid-template-columns: 1fr; gap: 3rem; border-radius: 1.35rem 1.35rem 1.35rem .45rem; }
   .hero::after { left: 1.5rem; bottom: 2.5rem; }
-  .hero h1 { font-size: clamp(3rem, 14vw, 4.45rem); }
+  .hero h1 {
+    font-size: clamp(2.65rem, 12vw, 3.9rem);
+    letter-spacing: -.045em;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  .intro { font-size: 1.05rem; overflow-wrap: break-word; }
   .signal-card { max-width: 340px; }
   .latest { padding: 4.5rem 0; }
   .section-heading { align-items: start; }
