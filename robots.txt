@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://decirloantes.github.io/sitemap.xml
