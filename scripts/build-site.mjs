@@ -323,8 +323,13 @@ for (let index = 0; index < duePosts.length; index += 1) {
   const category = Array.isArray(post.meta.categories)
     ? post.meta.categories[0]
     : "Conversaciones";
-  const newer = duePosts[index - 1];
-  const older = duePosts[index + 1];
+  const refreshChronologicalNavigation = (siteConfig.navigation_refresh_post_numbers ?? []).includes(post.number);
+  const navigationPosts = refreshChronologicalNavigation ? displayPosts : duePosts;
+  const navigationIndex = refreshChronologicalNavigation
+    ? navigationPosts.findIndex(item => item.number === post.number)
+    : index;
+  const newer = navigationPosts[navigationIndex - 1];
+  const older = navigationPosts[navigationIndex + 1];
   const navigation = [
     newer
       ? `<a href="/posts/${newer.meta.slug}/"><span>Más reciente</span>${escapeHtml(newer.meta.title)}</a>`
